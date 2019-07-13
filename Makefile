@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -g -c -Wall
 LDFLAGS = 
-SRC = main.c
-OBJ = main.o
+SRC = main.c vector.c hashtable.c
+OBJ = main.o vector.o hashtable.o
 FILES = $(SRC) vector.h hashtable.h
 NAME = c_containers
 
@@ -13,5 +13,4 @@ $(OBJ): $(FILES)
 	$(CC) $(CFLAGS) $(SRC)
 
 clean:
-	rm *o
-	rm $(NAME)
+	rm *o $(NAME)
