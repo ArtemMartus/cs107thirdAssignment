@@ -2,6 +2,7 @@
 #include <assert.h> // assert
 #include <stdlib.h> // malloc free realloc
 #include <string.h> //memcpy
+#include <stdio.h> //printf
 
 void VectorNew(vector* v, int elementSize, VectorFreeFunction freefn, 
 	int initialAllocation){
@@ -23,6 +24,9 @@ void disposeElement(void* element, void* auxData){
 	assert(element!=0); 
 	assert(auxData!=0);
 	VectorFreeFunction fn = (VectorFreeFunction)auxData;
+	#ifndef DNDEBUG
+	printf("Disposing element with provided free function\n");
+	#endif
 	fn(element);
 }
 
@@ -53,19 +57,52 @@ void* VectorNth(const vector* v, int position){
 }
 
 void VectorInsert(vector* v, const void* element, int position){
+	assert(v!=0);
+	assert(element!=0);
+	assert(position>=0);
+	assert(position<=v->size);
 
-}
-
-void VectorAppend(vector* v, const void* element){
-	assert(v != 0); 
 	int spaceFor = v->capacity / v->elementSize;
 	if(spaceFor <= v->size){
 		v->capacity += 3 * v->elementSize;
 		v->base = realloc(v->base, v->capacity);
 		assert(v->base != 0);
+		#ifndef DNDEBUG
+		printf("Vector base reallocated with new capacity of %d bytes\n",v->capacity);
+		#endif
 	}
-	memcpy(v->base + v->size * v->elementSize, element, v->elementSize);
+
+	void* bufferOne = malloc(v->elementSize);
+	void* bufferTwo = malloc(v->elementSize);
+	assert(bufferOne != 0);
+	assert(bufferTwo != 0);
+
+	memcpy(bufferOne,element,v->elementSize); // write element to bufferOne
+	int toShift = v->size - position;
+
+	while(toShift >= 0){ //shift to the right
+		memcpy(bufferTwo,v->base + (v->size - toShift) * v->elementSize, v->elementSize);
+		memcpy(v->base + (v->size - toShift) * v->elementSize, bufferOne ,v->elementSize);
+		memcpy(bufferOne, bufferTwo, v->elementSize);
+		toShift--;
+	}
+
+	free(bufferOne);
+	free(bufferTwo);
+
+	memcpy(v->base + position * v->elementSize, element, v->elementSize);
 	v->size++;
+
+	#ifndef DNDEBUG
+	printf("Element inserted, new vector size is %d\n",v->size);
+	#endif
+}
+
+void VectorAppend(vector* v, const void* element){
+	assert(v != 0); 
+	assert(element!=0);
+
+	VectorInsert(v,element,v->size);
 }
 
 void VectorReplace(vector* v, const void* element, int position){
@@ -80,6 +117,10 @@ void VectorReplace(vector* v, const void* element, int position){
 		v->freefn(pastElement);
 
 	memcpy(v->base + position * v->elementSize, element, v->elementSize);
+
+	#ifndef DNDEBUG
+	printf("Element %d replaced\n",position);
+	#endif
 }
 
 void VectorDelete(vector* v, int position){
@@ -96,6 +137,10 @@ void VectorDelete(vector* v, int position){
 			v->elementSize);
 	}
 	v->size--;
+
+	#ifndef DNDEBUG
+	printf("Element %d deleted, new size %d\n",position,v->size);
+	#endif
 }
 
 int VectorSearch(const vector* v, const void* key, VectorCompareFunction searchfn, 
@@ -106,19 +151,37 @@ int VectorSearch(const vector* v, const void* key, VectorCompareFunction searchf
 	assert(startIndex >= 0);
 
 	if(isSorted){
+		#ifndef DNDEBUG
+		printf("Binary search started..");
+		#endif
 		//use binary search
 	} else {
+		#ifndef DNDEBUG
+		printf("Linear search started..");
+		#endif
 		// use linear search
 		for(int i = startIndex; i < v->size; ++i){
-			if(searchfn(key,v->base + i * v->elementSize) == 0)
+			if(searchfn(key,v->base + i * v->elementSize) == 0){
+				#ifndef DNDEBUG
+				printf("found at %d\n",i);
+				#endif
 				return i;
+			}
 		}
 	}
+	#ifndef DNDEBUG
+	printf("not found\n");
+	#endif
 	return -1;
 }
 
 void VectorSort(vector* v, VectorCompareFunction comparefn){
+	assert(v != 0); 
+	assert(comparefn != 0);
 	// implement quick sort
+	#ifndef DNDEBUG
+	printf("Vector sorted\n");
+	#endif
 }
 
 void VectorMap(vector* v, VectorMapFunction mapfn, void* auxData){
@@ -127,4 +190,7 @@ void VectorMap(vector* v, VectorMapFunction mapfn, void* auxData){
 	for (int i = 0; i < v->size; ++i){
 		mapfn(v->base + i * v->elementSize, auxData);
 	}
+	#ifndef DNDEBUG
+	printf("Applied some function to vector\n");
+	#endif
 }
