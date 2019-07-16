@@ -1,4 +1,5 @@
 #include "vector.h"
+#include "hashtable.h"
 #include <stdio.h> // printf
 #include <assert.h> // assert
 #include <stdlib.h> // malloc, free
@@ -88,6 +89,9 @@ int main(){
 //Free memory
 	VectorDispose(v);
 	free(v);
+
+
+
 
 	return 0;
 }
