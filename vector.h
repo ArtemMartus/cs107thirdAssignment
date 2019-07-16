@@ -3,6 +3,9 @@
 #ifndef __vector__
 #define __vector__
 
+#include <stdlib.h>
+#include <stdio.h>
+
 typedef char bool;
 
 typedef int (*VectorCompareFunction)(const void* element1, const void* element2);
@@ -18,7 +21,7 @@ typedef struct {
 } vector;
 
 void VectorNew(vector* v, int elementSize, VectorFreeFunction freefn, 
-	int initialAllocation);
+	int initialAllocation); // initialAllocation means initial element count
 void VectorDispose(vector* v);
 int VectorLength(const vector* v);
 void* VectorNth(const vector* v, int position);

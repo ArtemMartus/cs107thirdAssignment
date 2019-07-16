@@ -14,6 +14,9 @@ void VectorNew(vector* v, int elementSize, VectorFreeFunction freefn,
 	v->size = 0;
 	v->elementSize = elementSize;
 	v->freefn = freefn;
+	#ifndef DNDEBUG
+	printf("Vector initial values set, allocated %d bytes\n",v->capacity);
+	#endif
 }
 
 void disposeElement(void* element, void* auxData){
@@ -28,7 +31,11 @@ void VectorDispose(vector* v){
 	if(v->freefn != 0){
 		VectorMap(v, disposeElement, (void*)v->freefn );
 	}
-	free(v);
+	if(v->base != 0)
+		free(v->base);
+	#ifndef DNDEBUG
+	printf("Vector base disposed\n");
+	#endif
 }
 
 int VectorLength(const vector* v){
