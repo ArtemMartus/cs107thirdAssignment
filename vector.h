@@ -3,13 +3,13 @@
 #ifndef __vector__
 #define __vector__
 
-#include "bool.h"
+typedef char bool;
 
 typedef int (*VectorCompareFunction)(const void* element1, const void* element2);
 typedef void (*VectorMapFunction)(void* element, void* auxData);
 typedef void (*VectorFreeFunction)(void* element);
 
-typedef struct{
+typedef struct {
 	void* base;
 	int size; // last element
 	int capacity; // bytes allocated
@@ -17,7 +17,7 @@ typedef struct{
 	VectorFreeFunction freefn;
 } vector;
 
-void VectorNew(struct vector* v, int elementSize, VectorFreeFunction freefn, 
+void VectorNew(vector* v, int elementSize, VectorFreeFunction freefn, 
 	int initialAllocation);
 void VectorDispose(vector* v);
 int VectorLength(const vector* v);
@@ -32,4 +32,4 @@ void VectorSort(vector* v, VectorCompareFunction comparefn);
 // VectorMap applies mapfn to each vector element with auxData if needed
 void VectorMap(vector* v, VectorMapFunction mapfn, void* auxData); 
 
-#endif __vector__
+#endif

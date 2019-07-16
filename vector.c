@@ -3,7 +3,7 @@
 #include <stdlib.h> // malloc free realloc
 #include <string.h> //memcpy
 
-void VectorNew(struct vector* v, int elementSize, VectorFreeFunction freefn, 
+void VectorNew(vector* v, int elementSize, VectorFreeFunction freefn, 
 	int initialAllocation){
 	assert(v!=0); 
 	assert(elementSize>=1); 

@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -g -c -Wall
 LDFLAGS = 
-SRC = main.c vector.c hashtable.c
-OBJ = main.o vector.o hashtable.o
+SRC = main.c vector.c 
+OBJ = main.o vector.o 
 FILES = $(SRC) vector.h hashtable.h
 NAME = c_containers
 
