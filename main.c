@@ -41,9 +41,7 @@ void printVector(vector* v){
 	printf("Values from vector %d %d %d %d\n",a,b,c,d);
 }
 
-
-int main(){
-	printf("Hello, World!\n");
+void testVector(){
 	vector* v = malloc(sizeof(vector)); //vector of integers
 	VectorNew(v,sizeof(int),0,3); 
 // lets fill this vector with {2,0,1,9}
@@ -89,9 +87,25 @@ int main(){
 //Free memory
 	VectorDispose(v);
 	free(v);
+}
 
+int hashFun(const void* element, int numBuckets){
+	return rand() % numBuckets;
+}
 
+void testHashset(){
+	sranddev();
+	hashset* h = malloc(sizeof(hashset));// hashset of integers
+	HashSetNew(h,sizeof(int),3,hashFun,compareInts,0);
 
+	printf("Hashes count %d\n", HashSetCount(h));
 
+	HashSetDispose(h);
+	free(h);
+}
+
+int main(){
+	printf("Hello, World!\n");
+	testHashset();
 	return 0;
 }

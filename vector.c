@@ -16,7 +16,8 @@ void VectorNew(vector* v, int elementSize, VectorFreeFunction freefn,
 	v->elementSize = elementSize;
 	v->freefn = freefn;
 	#ifndef DNDEBUG
-	printf("Vector initial values set, allocated %d bytes\n",v->capacity);
+	if(v->capacity>0)
+		printf("Vector initial values set, allocated %d bytes\n",v->capacity);
 	#endif
 }
 
@@ -219,6 +220,6 @@ void VectorMap(vector* v, VectorMapFunction mapfn, void* auxData){
 		mapfn(v->base + i * v->elementSize, auxData);
 	}
 	#ifndef DNDEBUG
-	printf("Applied some function to vector\n");
+	//printf("Applied some function to vector\n");
 	#endif
 }
