@@ -4,9 +4,7 @@
 #define __vector__
 
 
-typedef char bool;
-#define true 1
-#define false 0
+#include "bool.h"
 
 typedef int (*VectorCompareFunction)(const void* element1, const void* element2);
 typedef void (*VectorMapFunction)(void* element, void* auxData);
