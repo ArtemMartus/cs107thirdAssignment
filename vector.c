@@ -10,8 +10,10 @@ void VectorNew(vector* v, int elementSize, VectorFreeFunction freefn,
 	assert(elementSize>=1); 
 	assert(initialAllocation>=0);
 	v->capacity = initialAllocation * elementSize;
-	v->base = malloc(v->capacity);
-	assert(v->base != 0);
+	if(v->capacity > 0){
+		v->base = malloc(v->capacity);
+		assert(v->base != 0);
+	}
 	v->size = 0;
 	v->elementSize = elementSize;
 	v->freefn = freefn;
@@ -62,11 +64,15 @@ void VectorInsert(vector* v, const void* element, int position){
 	assert(element!=0);
 	assert(position>=0);
 	assert(position<=v->size);
+	assert(v->elementSize > 0);
 
 	int spaceFor = v->capacity / v->elementSize;
 	if(spaceFor <= v->size){
 		v->capacity += 3 * v->elementSize;
-		v->base = realloc(v->base, v->capacity);
+		if(spaceFor)
+			v->base = realloc(v->base, v->capacity);
+		else
+			v->base = malloc(v->capacity);
 		assert(v->base != 0);
 		#ifndef DNDEBUG
 		printf("Vector base reallocated with new capacity of %d bytes\n",v->capacity);

@@ -89,14 +89,57 @@ void testVector(){
 	free(v);
 }
 
+static int number;
+
 int hashFun(const void* element, int numBuckets){
-	return rand() % numBuckets;
+	return (number + *(int*)element) % numBuckets;
+}
+
+
+
+void innerHashsetMap(void* element, void* aux){ //divide function
+	assert(element!=0);
+	assert(aux!=0);
+	int* el = (int*)element;
+	int b = *(int*)aux;
+	int result = *el / b;
+	*el = result; 
+}
+void hashsetMapf(void* element, void* aux){
+	assert(element!=0);
+	assert(aux!=0);
+	vector* v = (vector*) element;
+	VectorMap(v,innerHashsetMap,aux);
 }
 
 void testHashset(){
 	sranddev();
+	number = rand();
 	hashset* h = malloc(sizeof(hashset));// hashset of integers
-	HashSetNew(h,sizeof(int),3,hashFun,compareInts,0);
+	HashSetNew(h,sizeof(int),0xff,hashFun,compareInts,0);
+
+	int year = 1931;
+	int someNumber = 1235124;
+
+	HashSetEnter(h,(void*)&year);
+	HashSetEnter(h,(void*)&someNumber); 
+
+	vector* searchOne = (vector*)HashSetLookup(h,(void*)&year);
+	vector* searchTwo = (vector*)HashSetLookup(h,(void*)&someNumber);
+
+	assert(searchOne != 0);
+	assert(searchTwo != 0);
+	assert(VectorLength(searchOne)>0);
+	assert(VectorLength(searchTwo)>0);
+
+	int a = *(int*)VectorNth(searchOne,0);
+	int b = *(int*)VectorNth(searchTwo,0);
+
+	assert(a == year);
+	assert(b == someNumber);
+
+	int divider = 1000;
+	HashSetMap(h,hashsetMapf,(void*)&divider);
 
 	printf("Hashes count %d\n", HashSetCount(h));
 

@@ -24,12 +24,12 @@ void HashSetNew(hashset* h, int elementSize, int numBuckets, HashSetHashFunction
 	h->comparefn = comparefn;
 
 	#ifndef DNDEBUG
-	int memoryAllocated = sizeof(vector) + sizeof(vector*)* numBuckets;
+	int memoryAllocated = sizeof(vector) + sizeof(vector) * numBuckets;
 	#endif
 	h->base = malloc(sizeof(vector));
 	assert(h->base != 0);
 
-	VectorNew(h->base, sizeof(vector*), 0, numBuckets); //vector of vectors
+	VectorNew(h->base, sizeof(vector), 0, numBuckets); //vector of vectors
 
 	for (int i = 0; i < numBuckets; ++i){
 		#ifndef DNDEBUG
@@ -58,12 +58,6 @@ void HashSetDispose(hashset* h){
 	#endif
 }
 
-void countBuckets(void* element, void* aux){
-	vector* v = (vector*) element;
-	int* count = (int*) aux;
-	*count += VectorLength(v);
-}
-
 int HashSetCount(const hashset* h){
 	assert(h != 0);
 	assert(h->base != 0);
@@ -71,19 +65,45 @@ int HashSetCount(const hashset* h){
 	for (int i = 0; i < h->numBuckets; ++i)
 	{
 		vector* v = VectorNth(h->base, i);
-		VectorMap(v,countBuckets,&count);
+		count += VectorLength(v);
 	}
 	return count;
 }
 
 void HashSetEnter(hashset* h, const void* element){
-
+	assert(h != 0);
+	assert(h->base != 0);
+	assert(element != 0);
+	assert(h->comparefn != 0);
+	assert(h->hashfn != 0);
+	vector* bucket = VectorNth(h->base,h->hashfn(element,h->numBuckets));
+	VectorAppend(bucket,element);
+	if(VectorLength(bucket) > 1)
+		VectorSort(bucket,h->comparefn);
 }
 
 void* HashSetLookup(const hashset* h, const void* element){
+	assert(h != 0);
+	assert(h->base != 0);
+	assert(element != 0);
+	assert(h->hashfn != 0);
+	vector* bucket = VectorNth(h->base,h->hashfn(element,h->numBuckets));
+	if(VectorLength(bucket)>0)
+		return bucket;
 	return 0;
 }
 
 void HashSetMap(hashset* h, HashSetMapFunction mapfn, void* auxData){
-
+	assert(h != 0);
+	assert(h->base != 0);
+	assert(mapfn != 0);
+	for (int i = 0; i < h->numBuckets; ++i)
+	{
+		vector* v = VectorNth(h->base, i);
+		if(VectorLength(v) > 0)
+			mapfn(v, auxData);
+	}
+	#ifndef DNDEBUG
+	printf("Applied some function to hashset\n");
+	#endif
 }
