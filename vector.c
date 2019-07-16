@@ -146,15 +146,36 @@ void VectorDelete(vector* v, int position){
 int VectorSearch(const vector* v, const void* key, VectorCompareFunction searchfn, 
 	int startIndex, bool isSorted){
 	assert(v != 0);
+	assert(v->base != 0);
 	assert(key != 0);
 	assert(searchfn != 0);
 	assert(startIndex >= 0);
+	assert(v->size > 0);
 
 	if(isSorted){
 		#ifndef DNDEBUG
 		printf("Binary search started..");
 		#endif
+		int min = 0;
+		int max = v->size + 1;
+		int mid = (min + max) / 2;	
+		void *el = VectorNth(v,mid);
 		//use binary search
+		while ( max - min >= 1 ){
+			int searchRet = searchfn(key,el);
+			if( searchRet == 0){
+				#ifndef DNDEBUG
+				printf("found at %d\n",mid);
+				#endif
+				return mid;
+			} else if ( searchRet > 0 ) {
+				min = mid - 1;
+			} else {
+				max = mid;
+			}
+			mid = (min + max) / 2;
+			el = VectorNth(v,mid);
+		}
 	} else {
 		#ifndef DNDEBUG
 		printf("Linear search started..");
@@ -178,9 +199,16 @@ int VectorSearch(const vector* v, const void* key, VectorCompareFunction searchf
 void VectorSort(vector* v, VectorCompareFunction comparefn){
 	assert(v != 0); 
 	assert(comparefn != 0);
-	// implement quick sort
+	assert(v->base!= 0);
+
+	int retVal = mergesort(v->base, v->size, v->elementSize, comparefn);
+
 	#ifndef DNDEBUG
-	printf("Vector sorted\n");
+	if(retVal == 0)
+	// implement quick sort
+		printf("Vector sorted\n");
+	else
+		printf("Vector NOT sorted\n");
 	#endif
 }
 

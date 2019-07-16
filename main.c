@@ -8,7 +8,7 @@
 int compareInts(const void* a, const void* b){
 	int i1 = *(int*)a;
 	int i2 = *(int*)b;
-	return i1 - i2;
+	return i2 - i1;
 }
 
 void mapInts(void* pElement,void* pbyNum){ // add function
